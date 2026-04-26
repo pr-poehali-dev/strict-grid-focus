@@ -1,4 +1,5 @@
 import Icon from "@/components/ui/icon";
+import type { User } from "@/hooks/useAuth";
 
 interface HeaderProps {
   city: string;
@@ -7,6 +8,7 @@ interface HeaderProps {
   onNav: (page: string) => void;
   cartCount: number;
   favCount: number;
+  user: User | null;
 }
 
 const NAV_ITEMS = [
@@ -17,7 +19,10 @@ const NAV_ITEMS = [
   { id: "contacts", label: "Контакты" },
 ];
 
-export default function Header({ city, onCityClick, currentPage, onNav, cartCount, favCount }: HeaderProps) {
+export default function Header({ city, onCityClick, currentPage, onNav, cartCount, favCount, user }: HeaderProps) {
+  const initials = user?.name
+    ? user.name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)
+    : "";
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -88,9 +93,15 @@ export default function Header({ city, onCityClick, currentPage, onNav, cartCoun
             {/* Profile */}
             <button
               onClick={() => onNav("profile")}
-              className="p-2.5 rounded-xl hover:bg-muted transition-all"
+              className={`p-1.5 rounded-xl hover:bg-muted transition-all flex items-center gap-1.5 ${currentPage === "profile" ? "text-teal" : "text-brand-black"}`}
             >
-              <Icon name="User" size={20} className={currentPage === "profile" ? "text-teal" : "text-brand-black"} />
+              {user ? (
+                <div className="w-7 h-7 rounded-lg bg-teal text-white text-xs font-bold flex items-center justify-center">
+                  {initials || "👤"}
+                </div>
+              ) : (
+                <Icon name="User" size={20} />
+              )}
             </button>
           </div>
         </div>

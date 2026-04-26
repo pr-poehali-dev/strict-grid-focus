@@ -10,17 +10,25 @@ import ProfilePage from "./ProfilePage";
 import AboutPage from "./AboutPage";
 import ContactsPage from "./ContactsPage";
 import ShopDetailPage from "./ShopDetailPage";
-
-interface CartItem {
-  id: number;
-  qty: number;
-}
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Index() {
+  const {
+    user,
+    favourites,
+    cart,
+    login,
+    register,
+    logout,
+    toggleFavourite,
+    addToCart,
+    updateCartQty,
+    removeFromCart,
+    clearCart,
+  } = useAuth();
+
   const [city, setCity] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState("home");
-  const [favourites, setFavourites] = useState<number[]>([]);
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedShop, setSelectedShop] = useState<string | null>(null);
   const [showCityPicker, setShowCityPicker] = useState(false);
 
@@ -32,32 +40,6 @@ export default function Index() {
   const handleNav = useCallback((page: string) => {
     setCurrentPage(page);
     setSelectedShop(null);
-  }, []);
-
-  const handleFavourite = useCallback((id: number) => {
-    setFavourites((prev) =>
-      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
-    );
-  }, []);
-
-  const handleAddToCart = useCallback((id: number) => {
-    setCart((prev) => {
-      const existing = prev.find((c) => c.id === id);
-      if (existing) return prev.map((c) => c.id === id ? { ...c, qty: c.qty + 1 } : c);
-      return [...prev, { id, qty: 1 }];
-    });
-  }, []);
-
-  const handleUpdateQty = useCallback((id: number, qty: number) => {
-    if (qty <= 0) {
-      setCart((prev) => prev.filter((c) => c.id !== id));
-    } else {
-      setCart((prev) => prev.map((c) => c.id === id ? { ...c, qty } : c));
-    }
-  }, []);
-
-  const handleRemoveFromCart = useCallback((id: number) => {
-    setCart((prev) => prev.filter((c) => c.id !== id));
   }, []);
 
   const handleShopClick = useCallback((seller: string) => {
@@ -77,8 +59,8 @@ export default function Index() {
         <ShopDetailPage
           seller={selectedShop}
           favourites={favourites}
-          onFavourite={handleFavourite}
-          onAddToCart={handleAddToCart}
+          onFavourite={toggleFavourite}
+          onAddToCart={addToCart}
           onBack={() => handleNav("shops")}
         />
       );
@@ -90,21 +72,21 @@ export default function Index() {
           <HomePage
             city={city}
             favourites={favourites}
-            onFavourite={handleFavourite}
-            onAddToCart={handleAddToCart}
+            onFavourite={toggleFavourite}
+            onAddToCart={addToCart}
             onShopClick={handleShopClick}
           />
         );
       case "categories":
         return <CategoriesPage />;
       case "shops":
-        return <ShopsPage />;
+        return <ShopsPage onShopClick={handleShopClick} />;
       case "favourites":
         return (
           <FavouritesPage
             favourites={favourites}
-            onFavourite={handleFavourite}
-            onAddToCart={handleAddToCart}
+            onFavourite={toggleFavourite}
+            onAddToCart={addToCart}
             onShopClick={handleShopClick}
           />
         );
@@ -112,12 +94,21 @@ export default function Index() {
         return (
           <CartPage
             cart={cart}
-            onUpdateQty={handleUpdateQty}
-            onRemove={handleRemoveFromCart}
+            onUpdateQty={updateCartQty}
+            onRemove={removeFromCart}
+            onClear={clearCart}
           />
         );
       case "profile":
-        return <ProfilePage />;
+        return (
+          <ProfilePage
+            user={user}
+            onLogin={login}
+            onRegister={register}
+            onLogout={logout}
+            onNav={handleNav}
+          />
+        );
       case "about":
         return <AboutPage />;
       case "contacts":
@@ -140,6 +131,7 @@ export default function Index() {
         onNav={handleNav}
         cartCount={cartCount}
         favCount={favourites.length}
+        user={user}
       />
 
       {renderPage()}

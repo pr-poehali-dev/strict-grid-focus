@@ -11,9 +11,10 @@ interface CartPageProps {
   cart: CartItem[];
   onUpdateQty: (id: number, qty: number) => void;
   onRemove: (id: number) => void;
+  onClear?: () => void;
 }
 
-export default function CartPage({ cart, onUpdateQty, onRemove }: CartPageProps) {
+export default function CartPage({ cart, onUpdateQty, onRemove, onClear }: CartPageProps) {
   const [ordered, setOrdered] = useState(false);
 
   const cartProducts = cart.map((item) => ({
@@ -102,7 +103,7 @@ export default function CartPage({ cart, onUpdateQty, onRemove }: CartPageProps)
                 </div>
               </div>
               <button
-                onClick={() => setOrdered(true)}
+                onClick={() => { setOrdered(true); onClear?.(); }}
                 className="w-full bg-teal text-white font-semibold py-3 rounded-xl hover:bg-teal/90 transition-all"
               >
                 Оформить заказ

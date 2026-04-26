@@ -57,7 +57,11 @@ const SHOPS = [
   },
 ];
 
-export default function ShopsPage() {
+interface ShopsPageProps {
+  onShopClick: (seller: string) => void;
+}
+
+export default function ShopsPage({ onShopClick }: ShopsPageProps) {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-2xl font-bold text-brand-black mb-2">Магазины</h1>
@@ -67,6 +71,7 @@ export default function ShopsPage() {
         {SHOPS.map((shop, i) => (
           <div
             key={shop.name}
+            onClick={() => onShopClick(shop.name)}
             className="bg-white border border-border rounded-2xl p-5 hover:border-teal/30 hover:shadow-md transition-all duration-200 cursor-pointer animate-slide-up"
             style={{ animationDelay: `${i * 50}ms` }}
           >
@@ -89,13 +94,19 @@ export default function ShopsPage() {
             <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">{shop.description}</p>
 
             <div className="flex items-center justify-between pt-3 border-t border-border">
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Icon name="MapPin" size={12} className="text-teal" />
-                {shop.city}
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Icon name="MapPin" size={12} className="text-teal" />
+                  {shop.city}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Icon name="Package" size={12} />
+                  {shop.products} товаров
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Icon name="Package" size={12} />
-                {shop.products} товаров
+              <div className="flex items-center gap-1 text-xs font-semibold text-teal">
+                Смотреть
+                <Icon name="ArrowRight" size={12} />
               </div>
             </div>
           </div>
